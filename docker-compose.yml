@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  wallethub.crawler:
+    container_name: wh-crawler
+    image: ${DOCKER_REGISTRY-}wallethubcrawler
+    build:
+      context: .
+      dockerfile: src/WalletHub.Crawler/Dockerfile
+
+  chrome:
+    image: selenium/node-chrome:4.0.0-alpha-7-prerelease-20201009
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - START_XVFB=true
+    ports:
+      - "6900:5900"
+
+  selenium-hub:
+    image: selenium/hub:4.0.0-alpha-7-prerelease-20201009
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
